@@ -1,0 +1,25 @@
+{% extends 'recipewizard/layout.html' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <h1 class="row justify-content-center">{{ title }}</h1>
+        <hr>
+        <form class="form-group row justify-content-center">
+            <input type="text" name="search" placeholder="Search" class="form-control col-md-5 col-3">
+            <i class="fa-solid fa-magnifying-glass order-1 search fa-lg"></i>
+        </form>
+        {% for recipe in recipes %}
+            <div class="row justify-content-center">
+                <div class="border p-2 mb-3 col-md-5 col-3 d-flex flex-row">
+                    <img src="{{ recipe.image }}" class="recipe-img-sm col-2">
+                    <div class="d-flex flex-column">
+                        <h4 class="w-100">{{ recipe.name }}</h4>
+                        <p>{{ recipe.description }}</p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <li>Nothing here yet...</li>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,35 @@
+* {
+    font-family: 'Open Sans', 'sans-serif';
+}
+
+.navbar-brand {
+    position: absolute;
+    left: 1vw;
+}
+
+.form-control {
+    margin-bottom: 10px;
+}
+
+.btn {
+    margin-bottom: 10px;
+}
+
+.recipe-img-sm {
+    max-height: 10vh;
+    object-fit: scale-down;
+}
+
+.recipe-img {
+    max-height: 30vh;
+    min-height: 30vh;
+}
+
+.search {
+    float:right;
+    margin-right: 10px;
+    margin-left: -30px;
+    margin-top: 18px;
+    position: relative;
+    color: lightblue;
+}

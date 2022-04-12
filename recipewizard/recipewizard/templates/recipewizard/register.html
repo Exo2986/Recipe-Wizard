@@ -1,0 +1,31 @@
+{% extends "recipewizard/layout.html" %}
+
+{% block body %}
+
+    <br><br>
+
+    <div class="d-flex flex-column align-items-center">
+        <form action="{% url 'register' %}" method="post" class="form-group w-25">
+
+            <h2>Register</h2>
+        
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags %} {{ message.tags }} {% endif %}" role="alert">
+                        {{ message }} 
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% csrf_token %}
+            <input class="form-control" autofocus type="text" name="username" placeholder="Username">
+            <input class="form-control" type="email" name="email" placeholder="Email Address">
+            <input class="form-control" type="password" name="password" placeholder="Password">
+            <input class="form-control" type="password" name="confirmation" placeholder="Confirm Password">
+            <input class="btn btn-primary" type="submit" value="Register">
+            <div>Already have an account? <a href="{% url 'login' %}">Log In here.</a></div>
+        </form>
+    </div>
+
+
+{% endblock %}
