@@ -3,17 +3,17 @@
 {% block body %}
     <div class="container-fluid">
         <div class="row justify-content-center mb-2">
-            <h2 class="col-auto">Example Recipe</h2>
+            <h2 class="col-auto">{{ name }}</h2>
             <button class="btn btn-primary">Save</button>
         </div>
         <div class="row justify-content-center mb-2">
-            <img src="https://images.immediate.co.uk/production/volatile/sites/30/2021/03/Cacio-e-Pepe-e44b9f8.jpg?quality=90&webp=true&resize=300,272" class="recipe-img">
+            <img src="{{ image }}" class="recipe-img">
         </div>
         <div class="row justify-content-center  ">
-            <p class="col-5">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p class="col-5">{{ description }}</p>
         </div>
         <div class="row justify-content-center">
-            <a href="https://www.google.com/">View recipe on external site.</a>
+            <a href="{{ url }}">View recipe on external site.</a>
         </div>
         <hr>
         <div class="row justify-content-center">
@@ -32,7 +32,7 @@
                         <tr class="{% if not ingredient.user_has_ingredient %}bg-danger{%endif%}">
                             <td>{{ ingredient.name }}</td>
                             <td>{{ ingredient.amount }}</td>
-                            <td>{{ ingredient.measurement }}</td>
+                            <td>{{ ingredient.unit }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
