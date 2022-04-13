@@ -9,7 +9,7 @@
             <i class="fa-solid fa-magnifying-glass order-1 search fa-lg"></i>
         </form>
         {% for recipe in recipes %}
-            <div class="row justify-content-center">
+            <a href="{% url 'recipe' recipe.id %}" class="row justify-content-center">
                 <div class="border p-2 mb-3 col-md-5 col-3 d-flex flex-row">
                     <img src="{{ recipe.image }}" class="recipe-img-sm col-2">
                     <div class="d-flex flex-column">
@@ -17,9 +17,23 @@
                         <p>{{ recipe.description }}</p>
                     </div>
                 </div>
-            </div>
+            </a>
         {% empty %}
             <li>Nothing here yet...</li>
         {% endfor %}
+        <div class="row justify-content-center">
+            <div class="col-md-5 col-3 d-flex">
+                <a href="{% url page_url page|add:"-1" %}" class="mr-auto">
+                    {% if page > 1 %}
+                        <btn class="btn btn-primary">Prev</btn>
+                    {% endif %}
+                </a>
+                <a href="{% url page_url page|add:"1" %}">
+                    {% if page|add:"1" <= max_pages %}
+                        <btn class="btn btn-primary">Next</btn>
+                    {% endif %}
+                </a>
+            </div>
+        </div>
     </div>
 {% endblock %}

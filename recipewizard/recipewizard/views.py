@@ -15,7 +15,7 @@ from django.db.models import Q
 
 api = APIManager()
 
-api.get_and_store_random_recipes(10)
+#api.get_and_store_random_recipes(30)
 
 def login_view(request):
     if request.method == "POST":
@@ -70,34 +70,33 @@ def account(request):
     return render(request, "recipewizard/account.html")
 
 @login_required
-def index(request):
-    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in Recipe.objects.order_by('?')[:10]]
+def index(request, page_num=1):
+    paginator = Paginator(Recipe.objects.all(), 10)
+
+    page_num = max(1, min(page_num, paginator.num_pages-1)) #clamp in range [1, num_pages)
+    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
     return render(request, "recipewizard/recipes_view.html", {
         "title": "All Recipes",
+        "page": page_num,
+        "max_pages": paginator.num_pages,
+        "page_url": "index-page",
         "recipes": recipes
     })
 
 @login_required
-def cookbook(request):
+def cookbook(request, page_num = 1):
+    paginator = Paginator(request.user.recipes.all(), 10)
+
+    print(paginator.num_pages)
+
+    page_num = max(1, min(page_num, paginator.num_pages)) #clamp in range [1, num_pages)
+    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
     return render(request, "recipewizard/recipes_view.html", {
         "title": "My Cookbook",
-        "recipes": (
-            {
-                "name": "Test1",
-                "description": "This is a test.",
-                "image": "https://www.simplyrecipes.com/thmb/mbN8mXZ0srgAT1YrDU61183t0uM=/648x0/filters:no_upscale():max_bytes(150000):strip_icc():format(webp)/Simply-Recipes-Homemade-Pizza-Dough-Lead-Shot-1b-ea13798d224048b3a28afb0936c9b645.jpg"     
-            }, 
-            {
-                "name": "Test2",
-                "description": "This is a test.",
-                "image": "https://images.immediate.co.uk/production/volatile/sites/30/2013/05/Puttanesca-fd5810c.jpg?quality=90&webp=true&resize=300,272"     
-            }, 
-            {
-                "name": "Test2",
-                "description": "This is a test.",
-                "image": "https://images.immediate.co.uk/production/volatile/sites/30/2021/03/Cacio-e-Pepe-e44b9f8.jpg?quality=90&webp=true&resize=300,272"     
-            }
-        )
+        "page": page_num,
+        "max_pages": paginator.num_pages,
+        "page_url": "cookbook-page",
+        "recipes": recipes
     })
 
 @login_required
@@ -152,12 +151,31 @@ def recipe(request, recipe_id):
     except Recipe.DoesNotExist:
         return JsonResponse({"error": "No such recipe."}, status=404)
 
-    ingredients = [{"user_has_ingredient": True, "name": x.name, "amount": x.amount, "unit": x.unit} for x in recipe.ingredients.all()]
+    ingredients = [{"user_has_ingredient": True, "name": x.name, "amount": x.format_amount(), "unit": x.unit} for x in recipe.ingredients.all()]
 
     return render(request, "recipewizard/recipe_view.html", {
         "name": recipe.name,
         "description": f"Source: {recipe.source_name}",
         "url": recipe.source_url,
         "image": recipe.image_url,
+        "id": recipe.id,
+        "saved": request.user.is_recipe_saved(recipe.id),
         "ingredients": ingredients
     })
+
+@csrf_exempt
+@login_required
+def save_recipe(request, recipe_id):
+    if request.method == "PUT":
+        try:
+            recipe = Recipe.objects.filter(pk=recipe_id).first()
+        except Exception:
+            return JsonResponse({"error": "Recipe not found."}, status=404)
+        else:
+            saved = request.user.is_recipe_saved(recipe_id)
+            if saved:
+                request.user.recipes.remove(recipe)
+            else:
+                request.user.recipes.add(recipe)
+
+            return JsonResponse({"saved": not saved})

@@ -1,16 +1,18 @@
 {% extends 'recipewizard/layout.html' %}
 
+{% load static %}
+
 {% block body %}
     <div class="container-fluid">
         <div class="row justify-content-center mb-2">
             <h2 class="col-auto">{{ name }}</h2>
-            <button class="btn btn-primary">Save</button>
+            <button class="btn btn-primary" id="save-recipe" data-id="{{ id }}">{% if saved %}Unsave{% else %}Save{% endif %}</button>
         </div>
         <div class="row justify-content-center mb-2">
             <img src="{{ image }}" class="recipe-img">
         </div>
-        <div class="row justify-content-center  ">
-            <p class="col-5">{{ description }}</p>
+        <div class="row justify-content-center">
+            <p>{{ description }}</p>
         </div>
         <div class="row justify-content-center">
             <a href="{{ url }}">View recipe on external site.</a>
@@ -69,4 +71,8 @@
         </div>
         
     </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'recipewizard/recipe_view.js' %}"></script>
 {% endblock %}
