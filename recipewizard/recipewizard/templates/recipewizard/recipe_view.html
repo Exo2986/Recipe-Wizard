@@ -20,7 +20,7 @@
         <hr>
         <div class="row justify-content-center">
             <div class="col-1 mt-1">Serving Count: </div>
-            <input type="text" name="servingCount" class="form-control col-1" value="3">
+            <input type="number" name="servingCount" class="form-control col-1" value="3" id="serving-count">
         </div>
         <div class="row justify-content-center">
             <table class="mx-auto w-auto table table-responsive">
@@ -33,7 +33,7 @@
                     {% for ingredient in ingredients %}
                         <tr class="{% if not ingredient.user_has_ingredient %}bg-danger{%endif%}">
                             <td>{{ ingredient.name }}</td>
-                            <td>{{ ingredient.amount }}</td>
+                            <td class="ingredient-amount" data-original-amount="{{ingredient.amount}}">{{ ingredient.amount }}</td>
                             <td>{{ ingredient.unit }}</td>
                         </tr>
                     {% endfor %}
