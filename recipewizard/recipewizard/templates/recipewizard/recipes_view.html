@@ -4,8 +4,9 @@
     <div class="container-fluid">
         <h1 class="row justify-content-center">{{ title }}</h1>
         <hr>
-        <form class="form-group row justify-content-center">
-            <input type="text" name="search" placeholder="Search" class="form-control col-md-5 col-3">
+        <form class="form-group row justify-content-center" action="{% url 'search' 1 %}">
+            <input type="text" name="q" placeholder="Search" class="form-control col-md-5 col-3">
+            <input type="hidden" name="m" value="{{search_mode}}">
             <i class="fa-solid fa-magnifying-glass order-1 search fa-lg"></i>
         </form>
         {% for recipe in recipes %}
@@ -23,16 +24,24 @@
         {% endfor %}
         <div class="row justify-content-center">
             <div class="col-md-5 col-3 d-flex">
-                <a href="{% url page_url page|add:"-1" %}" class="mr-auto">
+                <form action="{% url page_url page|add:"-1" %}" class="mr-auto">
                     {% if page > 1 %}
-                        <btn class="btn btn-primary">Prev</btn>
+                        <input type="submit" class="btn btn-primary" value="Prev">
+                        {% if request.GET.q %}
+                            <input type="hidden" name="q" value="{{request.GET.q}}">
+                            <input type="hidden" name="m" value="{{request.GET.m}}">
+                        {% endif %}
                     {% endif %}
-                </a>
-                <a href="{% url page_url page|add:"1" %}">
+                </form>
+                <form action="{% url page_url page|add:"1" %}">
                     {% if page|add:"1" <= max_pages %}
-                        <btn class="btn btn-primary">Next</btn>
+                        <input type="submit" class="btn btn-primary" value="Next">
+                        {% if request.GET.q %}
+                            <input type="hidden" name="q" value="{{request.GET.q}}">
+                            <input type="hidden" name="m" value="{{request.GET.m}}">
+                        {% endif %}
                     {% endif %}
-                </a>
+                </form>
             </div>
         </div>
     </div>

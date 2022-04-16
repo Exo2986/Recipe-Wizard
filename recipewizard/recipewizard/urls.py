@@ -24,6 +24,7 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("", views.index, name="index"),
     path("<int:page_num>", views.index, name="index-page"),
+    path("search/<int:page_num>/", views.search, name="search"),
     path("recipe/<int:recipe_id>", views.recipe, name="recipe"),
     path("recipe/<int:recipe_id>/save", views.save_recipe, name="save_recipe"),
     path("cookbook", views.cookbook, name="cookbook"),

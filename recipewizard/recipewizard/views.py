@@ -80,6 +80,26 @@ def index(request, page_num=1):
         "page": page_num,
         "max_pages": paginator.num_pages,
         "page_url": "index-page",
+        "search_mode": 1,
+        "recipes": recipes
+    })
+    
+@login_required
+def search(request, page_num):
+    mode = request.GET.get("m", "1")
+    if mode == "1":
+        paginator = Paginator(Recipe.objects.filter(name__contains=request.GET.get("q", "")), 10)
+    else:
+        paginator = Paginator(request.user.recipes.filter(name__contains=request.GET.get("q", "")), 10)
+
+    page_num = max(1, min(page_num, paginator.num_pages-1)) #clamp in range [1, num_pages)
+    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
+    return render(request, "recipewizard/recipes_view.html", {
+        "title": "Search Results",
+        "page": page_num,
+        "max_pages": paginator.num_pages,
+        "page_url": "search",
+        "search_mode": mode,
         "recipes": recipes
     })
 
@@ -96,6 +116,7 @@ def cookbook(request, page_num = 1):
         "page": page_num,
         "max_pages": paginator.num_pages,
         "page_url": "cookbook-page",
+        "search_mode": 2,
         "recipes": recipes
     })
 
