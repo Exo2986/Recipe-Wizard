@@ -73,8 +73,8 @@ def account(request):
 def index(request, page_num=1):
     paginator = Paginator(Recipe.objects.all(), 10)
 
-    page_num = max(1, min(page_num, paginator.num_pages-1)) #clamp in range [1, num_pages)
-    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
+    page_num = max(1, min(page_num, paginator.num_pages)) #clamp in range [1, num_pages)
+    recipes = [{"name": x.name, "description": f"Source: {x.source_name}" if x.source_name else "", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
     return render(request, "recipewizard/recipes_view.html", {
         "title": "All Recipes",
         "page": page_num,
@@ -86,18 +86,22 @@ def index(request, page_num=1):
     
 @login_required
 def search(request, page_num):
+    query = request.GET.get("q", "")
+
     mode = request.GET.get("m", "1")
     if mode == "1":
-        paginator = Paginator(Recipe.objects.filter(name__contains=request.GET.get("q", "")), 10)
+        api.get_and_store_recipes_by_query(query=query, num=20, offset=(page_num-1)*20)
+        paginator = Paginator(Recipe.objects.filter(name__contains=query).order_by("-added"), 10)
     else:
-        paginator = Paginator(request.user.recipes.filter(name__contains=request.GET.get("q", "")), 10)
+        paginator = Paginator(request.user.recipes.filter(name__contains=query).order_by("name"), 10)
+    max_pages = paginator.num_pages
 
-    page_num = max(1, min(page_num, paginator.num_pages-1)) #clamp in range [1, num_pages)
-    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
+    page_num = max(1, min(page_num, max_pages)) #clamp in range [1, max_pages)
+    recipes = [{"name": x.name, "description": f"Source: {x.source_name}" if x.source_name else "", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
     return render(request, "recipewizard/recipes_view.html", {
         "title": "Search Results",
         "page": page_num,
-        "max_pages": paginator.num_pages,
+        "max_pages": max_pages,
         "page_url": "search",
         "search_mode": mode,
         "recipes": recipes
@@ -110,7 +114,7 @@ def cookbook(request, page_num = 1):
     print(paginator.num_pages)
 
     page_num = max(1, min(page_num, paginator.num_pages)) #clamp in range [1, num_pages)
-    recipes = [{"name": x.name, "description": f"Source: {x.source_name}", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
+    recipes = [{"name": x.name, "description": f"Source: {x.source_name}" if x.source_name else "", "image": x.image_url, "id": x.id} for x in paginator.get_page(page_num)]
     return render(request, "recipewizard/recipes_view.html", {
         "title": "My Cookbook",
         "page": page_num,

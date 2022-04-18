@@ -13,12 +13,12 @@ class Recipe(models.Model):
     source_url = models.URLField(max_length=256)
     servings = models.IntegerField()
     api_id = models.IntegerField(unique=True)
-    source_name = models.CharField(max_length=100)
+    source_name = models.CharField(max_length=100, null=True)
     image_url = models.URLField(max_length=256, blank=True)
     name = models.CharField(max_length=100)
+    added = models.DateField(auto_now_add=True)
 
     def from_json(recipe_json):
-        result = None
         try:
             recipe_obj = Recipe()
 
@@ -32,8 +32,8 @@ class Recipe(models.Model):
             recipe_obj.save()
 
             result = recipe_obj
-        except IntegrityError: #If recipe is already in the database then don't store it again
-            result = Recipe.objects.filter(pk=recipe_json.get("id"))
+        except IntegrityError as e: #If recipe is already in the database then don't store it again
+            result = Recipe.objects.filter(api_id=recipe_json.get("id")).first()
         else:
             for ingredient_json in recipe_json["extendedIngredients"]:
                 ingredient_obj = Ingredient()
