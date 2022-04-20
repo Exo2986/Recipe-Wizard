@@ -27,9 +27,12 @@ urlpatterns = [
     path("search/<int:page_num>/", views.search, name="search"),
     path("recipe/<int:recipe_id>", views.recipe, name="recipe"),
     path("recipe/<int:recipe_id>/save", views.save_recipe, name="save_recipe"),
+    path("kitchen/modify", views.modify_kitchen_ingredients, name="modify_kitchen_ingredients"),
     path("cookbook", views.cookbook, name="cookbook"),
     path("cookbook/<int:page_num>", views.cookbook, name="cookbook-page"),
     path("kitchen", views.kitchen, name="kitchen"),
-    path("shoppinglist", views.shopping_list, name="shopping_list"),
+    path("shoppinglist", views.shopping_list, name="shoppinglist"),
+    path("shoppinglist/modify", views.modify_shopping_list, name="modify_shopping_list"),
+    path("shoppinglist/clear", views.clear_shopping_list, name="clear_shopping_list"),
     path("account", views.account, name="account")
 ]

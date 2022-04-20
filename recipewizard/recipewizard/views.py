@@ -126,48 +126,101 @@ def cookbook(request, page_num = 1):
 
 @login_required
 def shopping_list(request):
-    messages.success(request, "Changes have been saved.")
+    ingredients = [{"name": x.name, "amount": x.format_amount(), "unit": x.unit, "id": x.id} for x in request.user.shopping_list.all()]
     return render(request, "recipewizard/shopping_list.html", {
-        "ingredients": (
-            {
-                "name": "Milk",
-                "amount": "1",
-                "measurement": "Cups"
-            },
-            {
-                "name": "Flour",
-                "amount": "4",
-                "measurement": "Cups"
-            },
-            {
-                "name": "Butter",
-                "amount": "2",
-                "measurement": "Stick"
-            }
-        )
+        "ingredients": ingredients
     })
 
 @login_required
+def modify_shopping_list(request):
+    if request.method == "POST":
+        method = request.POST["_method"].upper()
+        if method == "POST":
+            ingredient = Ingredient()
+
+            ingredient.amount = request.POST["amount"]
+            ingredient.unit = request.POST["unit"]
+            ingredient.name = request.POST["name"]
+
+            try:
+                ingredient.save()
+            except Exception as e:
+                messages.error(request, e)
+            else:
+                request.user.shopping_list.add(ingredient)
+                messages.success(request, "Item successfully added.")
+        elif method == "DELETE":
+            toDelete = request.POST.getlist("toDelete")
+            request.user.shopping_list.filter(id__in=toDelete).delete()
+            messages.success(request, "Item(s) successfully deleted.")
+    elif request.method == "PUT":
+        body_unicode = request.body.decode("utf-8")
+        body = json.loads(body_unicode)
+        updates = body["updates"]
+        
+        ingredients_to_update = [x["ingredient"] for x in updates]
+        ingredient_objs = request.user.shopping_list.filter(id__in=ingredients_to_update)
+
+        for obj in ingredient_objs:
+            table_entry = next((x for x in updates if int(x["ingredient"]) == obj.id), None)
+            if table_entry:
+                obj.amount = table_entry["value"]
+                obj.save()
+            
+    return HttpResponseRedirect(reverse("shoppinglist"))
+
+@login_required
+def clear_shopping_list(request):
+    if request.method == "POST":
+        request.user.shopping_list.all().delete()
+        messages.success(request, "Your shopping list has been cleared.")
+
+    return HttpResponseRedirect(reverse("shoppinglist"))
+
+@login_required
 def kitchen(request):
+    ingredients = [{"name": x.name, "amount": x.format_amount(), "unit": x.unit, "id": x.id} for x in request.user.ingredients.all()]
     return render(request, "recipewizard/my_kitchen.html", {
-        "ingredients": (
-            {
-                "name": "Milk",
-                "amount": "1",
-                "measurement": "Cups"
-            },
-            {
-                "name": "Flour",
-                "amount": "4",
-                "measurement": "Cups"
-            },
-            {
-                "name": "Butter",
-                "amount": "2",
-                "measurement": "Stick"
-            }
-        )
+        "ingredients": ingredients
     })
+
+@login_required
+def modify_kitchen_ingredients(request):
+    if request.method == "POST":
+        method = request.POST["_method"].upper()
+        if method == "POST":
+            ingredient = Ingredient()
+
+            ingredient.amount = request.POST["amount"]
+            ingredient.unit = request.POST["unit"]
+            ingredient.name = request.POST["name"]
+
+            try:
+                ingredient.save()
+            except Exception as e:
+                messages.error(request, e)
+            else:
+                request.user.ingredients.add(ingredient)
+                messages.success(request, "Item successfully added.")
+        elif method == "DELETE":
+            toDelete = request.POST.getlist("toDelete")
+            request.user.ingredients.filter(id__in=toDelete).delete()
+            messages.success(request, "Item(s) successfully deleted.")
+    elif request.method == "PUT":
+        body_unicode = request.body.decode("utf-8")
+        body = json.loads(body_unicode)
+        updates = body["updates"]
+        
+        ingredients_to_update = [x["ingredient"] for x in updates]
+        ingredient_objs = request.user.ingredients.filter(id__in=ingredients_to_update)
+
+        for obj in ingredient_objs:
+            table_entry = next((x for x in updates if int(x["ingredient"]) == obj.id), None)
+            if table_entry:
+                obj.amount = table_entry["value"]
+                obj.save()
+            
+    return HttpResponseRedirect(reverse("kitchen"))
 
 @login_required
 def recipe(request, recipe_id):
@@ -185,7 +238,8 @@ def recipe(request, recipe_id):
         "image": recipe.image_url,
         "id": recipe.id,
         "saved": request.user.is_recipe_saved(recipe.id),
-        "ingredients": ingredients
+        "ingredients": ingredients,
+        "servings": recipe.servings
     })
 
 @csrf_exempt

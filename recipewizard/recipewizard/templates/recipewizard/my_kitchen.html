@@ -1,5 +1,7 @@
 {% extends 'recipewizard/layout.html' %}
 
+{% load static %}
+
 {% block body %}
     <div class="container-fluid">
         <h1 class="row justify-content-center">My Kitchen</h1>
@@ -7,12 +9,11 @@
         <div class="row justify-content-center">
             <button class="btn btn-primary m-2" data-toggle="modal" data-target="#addModal">Add</button>
             <button class="btn btn-danger m-2" data-toggle="modal" data-target="#deleteModal">Delete Selected</button>
-            <button class="btn btn-primary m-2">Save</button>
+            <button class="btn btn-primary m-2" id="saveButton">Save</button>
         </div>
         <div class="row justify-content-center">
             <table class="mx-auto w-auto table table-responsive">
                 <thead>
-                    <th scope="col"></th>
                     <th scope="col">Ingredient</th>
                     <th scope="col">Amount</th>
                     <th scope="col">Measurement</th>
@@ -20,10 +21,9 @@
                 <tbody>
                     {% for ingredient in ingredients %}
                         <tr>
-                            <td><input class="form-check-input ml-1" type="checkbox"></td>
-                            <td>{{ ingredient.name }}</td>
-                            <td><input class="form-control col-4" type="text" value="{{ ingredient.amount }}"></td>
-                            <td>{{ ingredient.measurement }}</td>
+                            <td><label class="ml-4"><input class="form-check-input ingredient-checkbox" value="{{ ingredient.id }}" type="checkbox">{{ ingredient.name }}</label></td>
+                            <td><input class="form-control col-4 ingredient-amount-input" type="text" value="{{ ingredient.amount }}" data-original-value="{{ ingredient.amount }}" data-ingredient="{{ ingredient.id }}"></td>
+                            <td>{{ ingredient.unit }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -41,15 +41,17 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <form id="addIngredientForm" class="form">
-                        <input type="text" class="form-control" placeholder="Ingredient">
-                        <input type="text" class="form-control" placeholder="Amount">
-                        <input type="text" class="form-control" placeholder="Measurement">
+                    <form id="addIngredientForm" class="form" action="{% url 'modify_kitchen_ingredients' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="_method" value="post">
+                        <input type="text" name="name" class="form-control" placeholder="Ingredient">
+                        <input type="text" name="amount" class="form-control" placeholder="Amount">
+                        <input type="text" name="unit" class="form-control" placeholder="Unit">
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" type="submit" form="addIngredientForm">Submit</button>
+                    <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input class="btn btn-primary" type="submit" form="addIngredientForm" value="Submit">
                 </div>
             </div>
         </div>
@@ -61,13 +63,26 @@
                     <h5 class="modal-title" id="deleteModalLabel">Are you sure?</h5>
                 </div>
                 <div class="modal-body">
-                    <p>Are ypu sure you want to delete all selected items?</p>
+                    <p>Are you sure you want to delete all selected items?</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger">I'm Sure</button>
+                    <form class="form" id="deleteIngredientsForm" action="{% url 'modify_kitchen_ingredients' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="_method" value="delete">
+                        <fieldset>
+                            {% for ingredient in ingredients %}
+                                <input class="ingredient-delete-checkbox" name="toDelete" type="checkbox" value="{{ ingredient.id }}" hidden readonly>
+                            {% endfor %}
+                        </fieldset>
+                        <input type="submit" class="btn btn-danger" value="I'm Sure">
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'recipewizard/my_kitchen.js' %}"></script>
 {% endblock %}

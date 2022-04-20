@@ -1,10 +1,10 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db import IntegrityError
+from fractions import Fraction
 
 class User(AbstractUser):
     recipes = models.ManyToManyField("Recipe", related_name="+", blank=True)
-    shopping_list = models.ForeignKey("ShoppingList", on_delete=models.CASCADE, blank=True, null=True)
 
     def is_recipe_saved(self, recipe_id):
         return self.recipes.filter(pk=recipe_id).exists()
@@ -37,7 +37,7 @@ class Recipe(models.Model):
         else:
             for ingredient_json in recipe_json["extendedIngredients"]:
                 ingredient_obj = Ingredient()
-
+                
                 ingredient_obj.amount = ingredient_json["amount"]
                 ingredient_obj.unit = ingredient_json["unit"]
                 ingredient_obj.name = ingredient_json["name"]
@@ -56,9 +56,9 @@ class Ingredient(models.Model):
     amount = models.DecimalField(decimal_places=3, max_digits=8)
     unit = models.CharField(max_length=32)
     name = models.CharField(max_length=64)
-    api_id = models.IntegerField()
+    api_id = models.IntegerField(blank=True, null=True)
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE, related_name="ingredients", blank=True, null=True)
-    shopping_list = models.ForeignKey("ShoppingList", on_delete=models.CASCADE, related_name="ingredients", blank=True, null=True)
+    shopping_list = models.ForeignKey("User", on_delete=models.CASCADE, related_name="shopping_list", blank=True, null=True)
     user = models.ForeignKey("User", on_delete=models.CASCADE, related_name="ingredients", blank=True, null=True)
 
     def format_amount(self):
@@ -70,6 +70,3 @@ class Ingredient(models.Model):
             formatted = formatted[:-1]
 
         return formatted
-
-class ShoppingList(models.Model):
-    pass

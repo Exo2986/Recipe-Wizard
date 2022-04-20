@@ -39,6 +39,8 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     }
 
+    updateRecipeAmounts()
+
     servingCountInput.addEventListener("input", () => {
         servingCountInput.value.replaceAll(".","")
 
