@@ -31,7 +31,7 @@
                 </thead>
                 <tbody>
                     {% for ingredient in ingredients %}
-                        <tr class="{% if not ingredient.user_has_ingredient %}bg-danger{%endif%} ingredient-row" data-user-has-ingredient="{{ ingredient.user_has_ingredient }}">
+                        <tr class="ingredient-row" data-amount-user-has="{{ ingredient.amount_user_has }}">
                             <td class="ingredient-name">{{ ingredient.name }}</td>
                             <td class="ingredient-amount" data-original-amount="{{ingredient.amount}}">{{ ingredient.amount }}</td>
                             <td class="ingredient-unit">{{ ingredient.unit }}</td>

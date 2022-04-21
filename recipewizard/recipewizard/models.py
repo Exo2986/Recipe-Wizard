@@ -78,6 +78,9 @@ class Ingredient(models.Model):
         return convert_units(self, target_unit)
 
     def user_has_ingredient(self, user):
+        return self.amount_of_ingredient_in_user_kitchen(user) >= self.amount
+
+    def amount_of_ingredient_in_user_kitchen(self, user):
         matching_ingredients = user.ingredients.filter(name__iexact=self.name).all()
 
         total_amount = 0
@@ -85,6 +88,4 @@ class Ingredient(models.Model):
         for ingredient in matching_ingredients:
             total_amount += ingredient.convert_amount_to_unit(self.unit)
 
-        print(total_amount, " ", self.name, " ", self.amount, " ", self.unit)
-
-        return total_amount >= self.amount
+        return total_amount

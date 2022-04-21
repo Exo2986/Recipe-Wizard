@@ -22,23 +22,37 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => console.error(err));
     };
 
+    
+    let ingredients = Array.from(document.querySelectorAll(".ingredient-row"))
+    function updateRecipeRowHighlights() {
+        ingredients.forEach(ingredient => {
+            let amount = parseFloat(ingredient.querySelector(".ingredient-amount").innerHTML)
+
+            console.log(Math.abs(parseFloat(ingredient.dataset.amountUserHas) - amount) + " " + ingredient.dataset.amountUserHas + " " + amount)
+
+            if (parseFloat(ingredient.dataset.amountUserHas) < amount ) {
+                ingredient.classList.add("bg-danger")
+            } else {
+                ingredient.classList.remove("bg-danger")
+            }
+        })
+    }
+
     const btnPopulateShoppingList = document.querySelector("#btn-populate-shopping-list")
     const btnShowUpdatedModal = document.querySelector("#btn-show-updated-modal")
-    let ingredients = Array.from(document.querySelectorAll(".ingredient-row"))
 
     btnPopulateShoppingList.onclick = () => {
         let missingIngredients = []
         ingredients.forEach(ingredient => {
-            if (ingredient.dataset.userHasIngredient !== "True") {
+            let amount = ingredient.querySelector(".ingredient-amount").innerHTML
+
+            if (parseFloat(ingredient.dataset.amountUserHas) < parseFloat(amount)) {
                 let name = ingredient.querySelector(".ingredient-name").innerHTML
-                let amount = ingredient.querySelector(".ingredient-amount").innerHTML
                 let unit = ingredient.querySelector(".ingredient-unit").innerHTML
 
                 missingIngredients.push({name: name, amount: amount, unit: unit})
             }
         })
-        
-        console.log(missingIngredients)
 
         fetch(btnPopulateShoppingList.dataset.endpoint, {
             method: "POST",
@@ -77,6 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             amount.innerHTML = updated
         })
+
+        updateRecipeRowHighlights()
     }
 
     updateRecipeAmounts()

@@ -247,7 +247,7 @@ def recipe(request, recipe_id):
     except Recipe.DoesNotExist:
         return JsonResponse({"error": "No such recipe."}, status=404)
 
-    ingredients = [{"user_has_ingredient": x.user_has_ingredient(request.user), "name": x.name, "amount": x.format_amount(), "unit": x.unit} for x in recipe.ingredients.all()]
+    ingredients = [{"amount_user_has": x.amount_of_ingredient_in_user_kitchen(request.user), "name": x.name, "amount": x.format_amount(), "unit": x.unit} for x in recipe.ingredients.all()]
 
     return render(request, "recipewizard/recipe_view.html", {
         "name": recipe.name,
