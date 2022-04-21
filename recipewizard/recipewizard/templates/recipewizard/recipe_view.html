@@ -31,27 +31,45 @@
                 </thead>
                 <tbody>
                     {% for ingredient in ingredients %}
-                        <tr class="{% if not ingredient.user_has_ingredient %}bg-danger{%endif%}">
-                            <td>{{ ingredient.name }}</td>
+                        <tr class="{% if not ingredient.user_has_ingredient %}bg-danger{%endif%} ingredient-row" data-user-has-ingredient="{{ ingredient.user_has_ingredient }}">
+                            <td class="ingredient-name">{{ ingredient.name }}</td>
                             <td class="ingredient-amount" data-original-amount="{{ingredient.amount}}">{{ ingredient.amount }}</td>
-                            <td>{{ ingredient.unit }}</td>
+                            <td class="ingredient-unit">{{ ingredient.unit }}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="row justify-content-center">
-            <button class="btn btn-primary col-2">Add missing ingredients to shopping list</button>
+            <button class="btn btn-primary col-2" id="btn-populate-shopping-list" data-endpoint="{% url 'batch_add_to_shopping_list' %}">Add missing ingredients to shopping list</button>
         </div>
         <div class="row justify-content-center">
             <button class="btn btn-primary col-2" data-toggle="modal" data-target="#cookedModal">Mark recipe as cooked</button>
+            
+            <button id="btn-show-updated-modal" hidden data-toggle="modal" data-target="#shoppingListUpdatedModal"/>
+        </div>
+
+        <div class="modal fade" id="shoppingListUpdatedModal" tabindex="-1" role="dialog" aria-labelledby="shoppingListUpdatedModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="shoppingListUpdatedModalLabel">Missing Ingredients Added</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p>Missing ingredients have been successfully added to your shopping list.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" id="btn-shopping-list-updated-ok" data-redirect="{% url 'shoppinglist' %}">Ok</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="modal fade" id="cookedModal" tabindex="-1" role="dialog" aria-labelledby="cookedModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="addIngredientsModalLabel">Mark as Cooked</h5>
+                        <h5 class="modal-title" id="cookedModalLabel">Mark as Cooked</h5>
                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>

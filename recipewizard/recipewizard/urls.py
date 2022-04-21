@@ -34,5 +34,6 @@ urlpatterns = [
     path("shoppinglist", views.shopping_list, name="shoppinglist"),
     path("shoppinglist/modify", views.modify_shopping_list, name="modify_shopping_list"),
     path("shoppinglist/clear", views.clear_shopping_list, name="clear_shopping_list"),
+    path("shoppinglist/batchadd", views.batch_add_to_shopping_list, name="batch_add_to_shopping_list"),
     path("account", views.account, name="account")
 ]

@@ -4,34 +4,44 @@ from .models import *
 from django.db import IntegrityError
 import json
 
-class APIManager():
-    def get_and_store_random_recipes(self, num):
-        response = requests.get("https://api.spoonacular.com/recipes/random",\
-            params={"number": num},\
-            headers={"X-Api-Key": constants.NUTRITION_API_KEY})
+def get_and_store_random_recipes(num):
+    response = requests.get("https://api.spoonacular.com/recipes/random",\
+        params={"number": num},\
+        headers={"X-Api-Key": constants.NUTRITION_API_KEY})
 
-        js = response.json()
+    js = response.json()
 
-        for recipe_json in js["recipes"]:
-            Recipe.from_json(recipe_json)
+    for recipe_json in js["recipes"]:
+        Recipe.from_json(recipe_json)
 
-    def get_and_store_recipes_by_query(self, query, num, offset):
-        print("yea")
-        offset = max(0, min(900, offset)) #clamp between 0 and 900
-        print(offset)
-        params={"number": num, "query": query, "offset": offset, "fillIngredients": True, "addRecipeInformation": True, "sort": "popularity"}
+def get_and_store_recipes_by_query(query, num, offset):
+    offset = max(0, min(900, offset)) #clamp between 0 and 900
+    params={"number": num, "query": query, "offset": offset, "fillIngredients": True, "addRecipeInformation": True, "sort": "popularity"}
 
-        response = requests.get("https://api.spoonacular.com/recipes/complexSearch",\
-            params=params,\
-            headers={"X-Api-Key": constants.NUTRITION_API_KEY})
+    response = requests.get("https://api.spoonacular.com/recipes/complexSearch",\
+        params=params,\
+        headers={"X-Api-Key": constants.NUTRITION_API_KEY})
 
-        js = response.json()
+    js = response.json()
 
-        results = list()
+    results = list()
 
-        for recipe_json in js["results"]:
-            result = Recipe.from_json(recipe_json)
-            if result is not None:
-                results.append(result)
+    for recipe_json in js["results"]:
+        result = Recipe.from_json(recipe_json)
+        if result is not None:
+            results.append(result)
 
-        return results
+    return results
+
+def convert_units(ingredient, target_unit):
+    params = {"ingredientName": ingredient.name, "sourceAmount": ingredient.amount, "sourceUnit": ingredient.unit, "targetUnit": target_unit}
+
+    response = requests.get("https://api.spoonacular.com/recipes/convert",\
+        params=params,\
+        headers={"X-Api-Key": constants.NUTRITION_API_KEY})
+
+    js = response.json()
+
+    print(js)
+
+    return js["targetAmount"]

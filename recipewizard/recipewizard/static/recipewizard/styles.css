@@ -33,3 +33,13 @@
     position: relative;
     color: lightblue;
 }
+
+option[value=""][disabled] {
+    display: none;
+
+}
+.hidden {
+    display:none;
+    visibility: hidden;
+    opacity: 0;
+}
