@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db import IntegrityError
 from fractions import Fraction
-from .api_manager import *
+from . import api_manager
 
 class User(AbstractUser):
     recipes = models.ManyToManyField("Recipe", related_name="+", blank=True)
@@ -54,7 +54,7 @@ class Recipe(models.Model):
         return result
 
 
-supported_units = ["gallon", "teaspoon", "tablespoon", "fluid ounce", "cup", "pint", "quart", "milliliter", "liter", "pound", "ounce", "milligram", "gram", "kilogram", "other"]
+supported_units = ["gallon", "teaspoon", "tablespoon", "fluid ounce", "cup", "pint", "quart", "milliliter", "liter", "pound", "ounce", "milligram", "gram", "kilogram", "piece", "other"]
 class Ingredient(models.Model):
     amount = models.DecimalField(decimal_places=3, max_digits=8)
     unit = models.CharField(max_length=32)
@@ -75,7 +75,7 @@ class Ingredient(models.Model):
         return formatted
 
     def convert_amount_to_unit(self, target_unit):
-        return convert_units(self, target_unit)
+        return api_manager.convert_units(self, target_unit)
 
     def user_has_ingredient(self, user):
         return self.amount_of_ingredient_in_user_kitchen(user) >= self.amount

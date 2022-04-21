@@ -1,6 +1,6 @@
 import requests
 from . import constants
-from .models import *
+from . import models
 from django.db import IntegrityError
 import json
 
@@ -12,7 +12,7 @@ def get_and_store_random_recipes(num):
     js = response.json()
 
     for recipe_json in js["recipes"]:
-        Recipe.from_json(recipe_json)
+        models.Recipe.from_json(recipe_json)
 
 def get_and_store_recipes_by_query(query, num, offset):
     offset = max(0, min(900, offset)) #clamp between 0 and 900
@@ -27,7 +27,7 @@ def get_and_store_recipes_by_query(query, num, offset):
     results = list()
 
     for recipe_json in js["results"]:
-        result = Recipe.from_json(recipe_json)
+        result = models.Recipe.from_json(recipe_json)
         if result is not None:
             results.append(result)
 
