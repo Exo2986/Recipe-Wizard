@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     csrftoken = getCookie("csrftoken")
 
+    //Save button behavior
+
     const btnSave = document.querySelector("#save-recipe");
     let id = btnSave.dataset.id;
 
@@ -22,6 +24,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .catch(err => console.error(err));
     };
 
+    //Method to highlight ingredient rows
     
     let ingredients = Array.from(document.querySelectorAll(".ingredient-row"))
     function updateRecipeRowHighlights() {
@@ -37,6 +40,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         })
     }
+
+    //Populate shopping list button functionality
 
     const btnPopulateShoppingList = document.querySelector("#btn-populate-shopping-list")
     const btnShowUpdatedModal = document.querySelector("#btn-show-updated-modal")
@@ -70,9 +75,13 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     }
 
+    //Button to redirect user to shopping list when the shopping list updated modal is closed
+
     const btnShoppingListUpdatedOk = document.querySelector("#btn-shopping-list-updated-ok")
 
     btnShoppingListUpdatedOk.onclick= () => window.location.replace(btnShoppingListUpdatedOk.dataset.redirect)
+
+    //Functionality for changing the recipe's serving count
 
     const servingCountInput = document.querySelector("#serving-count")
     servingCountInput.dataset.originalServingCount = servingCountInput.value

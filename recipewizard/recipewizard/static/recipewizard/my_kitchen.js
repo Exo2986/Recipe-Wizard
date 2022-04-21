@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     csrftoken = getCookie("csrftoken")
 
+    //Whenever a checkbox is clicked, update the corresponding checkbox in the deletion form. There's probably a better way to do this but this works so whatever
+
     let deleteForm = document.querySelector("#deleteIngredientsForm")
 
     let checkboxes = document.querySelectorAll(".ingredient-checkbox")
@@ -11,6 +13,8 @@ document.addEventListener("DOMContentLoaded", () => {
             deleteCheckboxes.find(delEl => delEl.value == el.value).checked = el.checked
         })
     })
+
+    //Save button functionality. Sends a request to the server with all updated ingredients to be changed.
 
     let save = document.querySelector("#saveButton")
     let amounts = Array.from(document.querySelectorAll(".ingredient-amount-input"))
