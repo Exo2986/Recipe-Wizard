@@ -33,8 +33,14 @@ def get_and_store_recipes_by_query(query, num, offset):
 
     return results
 
-def convert_units(ingredient, target_unit):
-    params = {"ingredientName": ingredient.name, "sourceAmount": ingredient.amount, "sourceUnit": ingredient.unit, "targetUnit": target_unit}
+def convert_units_from_ingredient(ingredient, target_unit):
+    return convert_units(ingredient.name, ingredient.amount, ingredient.unit, target_unit)
+
+def convert_units(name, amount, unit, target_unit):
+    if target_unit == "":
+        target_unit = "Piece"
+    
+    params = {"ingredientName": name, "sourceAmount": amount, "sourceUnit": unit, "targetUnit": target_unit}
 
     response = requests.get("https://api.spoonacular.com/recipes/convert",\
         params=params,\

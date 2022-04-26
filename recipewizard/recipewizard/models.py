@@ -2,7 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db import IntegrityError
 from fractions import Fraction
+from django.db.models import Q
 from . import api_manager
+import decimal
 
 class User(AbstractUser):
     recipes = models.ManyToManyField("Recipe", related_name="+", blank=True)
@@ -54,7 +56,7 @@ class Recipe(models.Model):
         return result
 
 
-supported_units = ["gallon", "teaspoon", "tablespoon", "fluid ounce", "cup", "pint", "quart", "milliliter", "liter", "pound", "ounce", "milligram", "gram", "kilogram", "piece", "other"]
+supported_units = ["gallon", "teaspoon", "tablespoon", "fluid ounce", "cup", "pint", "quart", "milliliter", "liter", "pound", "ounce", "milligram", "gram", "kilogram", "piece"]
 class Ingredient(models.Model):
     amount = models.DecimalField(decimal_places=3, max_digits=8)
     unit = models.CharField(max_length=32)
@@ -75,13 +77,17 @@ class Ingredient(models.Model):
         return formatted
 
     def convert_amount_to_unit(self, target_unit):
-        return api_manager.convert_units(self, target_unit)
+        return api_manager.convert_units_from_ingredient(self, target_unit)
 
     def user_has_ingredient(self, user):
         return self.amount_of_ingredient_in_user_kitchen(user) >= self.amount
 
     def amount_of_ingredient_in_user_kitchen(self, user):
-        matching_ingredients = user.ingredients.filter(name__iexact=self.name).all()
+        test = user.ingredients.all()
+        for i in test:
+            print(self.name, " " , i.aliases.count())
+
+        matching_ingredients = user.ingredients.filter(Q(name__iexact=self.name) | Q(aliases__name__iexact=self.name)).all()
 
         total_amount = 0
 
@@ -89,3 +95,18 @@ class Ingredient(models.Model):
             total_amount += ingredient.convert_amount_to_unit(self.unit)
 
         return total_amount
+
+    def deduct_amount(self, name, amount, unit, tolerance):
+        if unit != self.unit:
+            amount = decimal.Decimal(api_manager.convert_units(name, amount, unit, self.unit))
+            
+        self.amount -= amount
+
+        if (self.amount < tolerance):
+            self.delete()
+        else:
+            self.save()
+
+class Alias(models.Model):
+    name = models.CharField(max_length=64)
+    ingredient = models.ForeignKey("Ingredient", on_delete=models.CASCADE, related_name="aliases", blank=True, null=True)

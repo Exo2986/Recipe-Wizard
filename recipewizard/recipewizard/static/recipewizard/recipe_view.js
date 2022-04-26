@@ -25,11 +25,18 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     //Method to highlight ingredient rows
+
+    const aliasFormAliasName = document.querySelector(".alias-form-alias-name")
     
     let ingredients = Array.from(document.querySelectorAll(".ingredient-row"))
     function updateRecipeRowHighlights() {
         ingredients.forEach(ingredient => {
             let amount = parseFloat(ingredient.querySelector(".ingredient-amount").innerHTML)
+            let dropdown = ingredient.querySelector(".ingredient-dropdown")
+
+            dropdown.onclick = () => {
+                aliasFormAliasName.value = dropdown.dataset.ingredientName
+            }
 
             console.log(Math.abs(parseFloat(ingredient.dataset.amountUserHas) - amount) + " " + ingredient.dataset.amountUserHas + " " + amount)
 
@@ -115,6 +122,58 @@ document.addEventListener("DOMContentLoaded", () => {
         if (servingCountInput.value > 0)
             updateRecipeAmounts()
     })
+
+    //submit "I've cooked this" form
+    const btnCookedForm = document.querySelector("#btn-cooked-form")
+    const cookedFormServingCount = document.querySelector("#cooked-form-serving-count")
+    const btnShowKitchenUpdatedModal = document.querySelector("#btn-show-kitchen-updated-modal")
+    const kitchenUpdatedStatusMessage = document.querySelector("#kitchen-updated-status-message")
+    
+    let shouldRedirect = false
+
+    btnCookedForm.onclick = () => {
+        ingredients_used = []
+
+        ingredients.forEach(ingredient => {
+            let amount = ingredient.querySelector(".ingredient-amount").innerHTML
+            let name = ingredient.querySelector(".ingredient-name").innerHTML
+            let unit = ingredient.querySelector(".ingredient-unit").innerHTML
+
+            let ratio = cookedFormServingCount.value / servingCountInput.dataset.originalServingCount
+            amount *= ratio
+
+            ingredients_used.push({name: name, amount: amount, unit: unit})
+        })
+
+        fetch(btnCookedForm.dataset.actionUrl, {
+            method: "PUT",
+            headers: {
+                "X-CSRFToken": csrftoken
+            },
+            body: JSON.stringify({
+                ingredients: JSON.stringify(ingredients_used)
+            })
+        })
+        .then(response => response.json())
+        .then(results => {
+            if (results.success){
+                kitchenUpdatedStatusMessage.innerHTML = "The ingredients in your kitchen have been updated."
+                shouldRedirect = true
+            } else {
+                kitchenUpdatedStatusMessage.innerHTML = results.error
+                shouldRedirect = false
+            }
+
+            btnShowKitchenUpdatedModal.click()
+        })
+    }
+
+    btnKitchenUpdatedOk = document.querySelector("#btn-kitchen-updated-ok")
+    
+    btnKitchenUpdatedOk.onclick= () => {
+        if (shouldRedirect)
+            window.location.replace(btnKitchenUpdatedOk.dataset.redirect)
+    }
 });
 
 function getCookie(name) {

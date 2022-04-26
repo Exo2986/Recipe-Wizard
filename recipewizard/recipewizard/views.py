@@ -12,6 +12,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Q
+import traceback
 
 def login_view(request):
     if request.method == "POST":
@@ -142,7 +143,7 @@ def batch_add_to_shopping_list(request):
             try:
                 ingredient.save()
             except Exception as e:
-                console.log(e)
+                print(e)
             else:
                 request.user.shopping_list.add(ingredient)
 
@@ -241,13 +242,70 @@ def modify_kitchen_ingredients(request):
     return HttpResponseRedirect(reverse("kitchen"))
 
 @login_required
+def deduct_ingredients_from_kitchen(request):
+    if request.method == "PUT":
+        body_unicode = request.body.decode("utf-8")
+        body = json.loads(body_unicode)
+        ingredients_to_deduct = json.loads(body["ingredients"])
+
+        try:
+            for ingredient in ingredients_to_deduct:
+                ingredients_in_kitchen = request.user.ingredients.filter(Q(name__iexact=ingredient["name"]) | Q(aliases__name__iexact=ingredient["name"])).iterator()
+                
+                amount_to_deduct = ingredient["amount"]
+                deduct_unit = ingredient["unit"]
+                deduct_name = ingredient["name"]
+                
+                next_ingredient = next(ingredients_in_kitchen, None)
+
+                while amount_to_deduct > 0 and next_ingredient is not None:
+                    next_ingredient_amount = next_ingredient.convert_amount_to_unit(deduct_unit)
+                    if amount_to_deduct > next_ingredient_amount:
+                        amount_to_deduct -= next_ingredient_amount
+                        next_ingredient.deduct_amount(next_ingredient.name, next_ingredient.amount, next_ingredient.unit, 0.01)
+                    else:
+                        next_ingredient.deduct_amount(deduct_name, amount_to_deduct, deduct_unit, 0.01)
+                        amount_to_deduct = 0
+
+                    next_ingredient = next(ingredients_in_kitchen, None)
+        except Exception as e:
+            traceback.print_exc()
+            return JsonResponse({"success": False, "error": str(e)})
+
+    return JsonResponse({"success": True})
+
+@login_required
+def add_ingredient_alias(request):
+    if request.method == "POST":
+        
+        ingredient = request.user.ingredients.filter(id=request.POST["ingredient_id"]).first() #need to add a dropdown to the alias menu to choose an ingredient, this was an oversight
+        alias_name = request.POST["alias"]
+
+        if ingredient and alias_name:
+            try:
+                alias = Alias()
+                alias.name = alias_name
+                print(alias.name)
+                alias.ingredient = ingredient
+                alias.save()
+            except Exception as e:
+                print(e)
+                messages.error(request, str(e))
+            else:
+                messages.success(request, "Alias successfully added.")
+
+        
+        return HttpResponseRedirect(reverse("recipe", kwargs={"recipe_id": request.POST["recipe_id"]}))    
+
+
+@login_required
 def recipe(request, recipe_id):
     try:
         recipe = Recipe.objects.filter(pk=recipe_id).first()
     except Recipe.DoesNotExist:
         return JsonResponse({"error": "No such recipe."}, status=404)
 
-    ingredients = [{"amount_user_has": x.amount_of_ingredient_in_user_kitchen(request.user), "name": x.name, "amount": x.format_amount(), "unit": x.unit} for x in recipe.ingredients.all()]
+    ingredients = [{"amount_user_has": x.amount_of_ingredient_in_user_kitchen(request.user), "id": x.id, "name": x.name, "amount": x.format_amount(), "unit": x.unit} for x in recipe.ingredients.all()]
 
     return render(request, "recipewizard/recipe_view.html", {
         "name": recipe.name,
@@ -257,7 +315,8 @@ def recipe(request, recipe_id):
         "id": recipe.id,
         "saved": request.user.is_recipe_saved(recipe.id),
         "ingredients": ingredients,
-        "servings": recipe.servings
+        "servings": recipe.servings,
+        "user_ingredients": request.user.ingredients.all()
     })
 
 @csrf_exempt
