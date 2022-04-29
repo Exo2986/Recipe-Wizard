@@ -3,11 +3,38 @@ from django.db import models
 from django.db import IntegrityError
 from fractions import Fraction
 from django.db.models import Q
+from datetime import datetime, timedelta, timezone
 from . import api_manager
 import decimal
 
 class User(AbstractUser):
     recipes = models.ManyToManyField("Recipe", related_name="+", blank=True)
+    failed_login_attempts = models.PositiveSmallIntegerField(default=0)
+    last_failed_login_attempt = models.DateTimeField(blank=True, null=True)
+    account_unlock_datetime = models.DateTimeField(blank=True, null=True)
+
+    def is_account_locked(self):
+        if self.account_unlock_datetime is not None:
+            now = datetime.now(tz=timezone(timedelta()))
+            if now < self.account_unlock_datetime:
+                return True
+            else:
+                self.account_unlock_datetime = None
+                self.failed_login_attempts = 0
+                self.save()
+        return False
+
+    def increment_failed_login_attempts(self):
+        if self.last_failed_login_attempt is not None and datetime.now(tz=timezone(timedelta())) - self.last_failed_login_attempt >= timedelta(minutes=5):
+            self.failed_login_attempts = 0
+        
+        self.failed_login_attempts+=1
+        self.last_failed_login_attempt = datetime.now(tz=timezone(timedelta()))
+
+        if self.failed_login_attempts >= 3:
+            self.account_unlock_datetime = datetime.now(tz=timezone(timedelta())) + timedelta(seconds=30)
+
+        self.save()
 
     def is_recipe_saved(self, recipe_id):
         return self.recipes.filter(pk=recipe_id).exists()

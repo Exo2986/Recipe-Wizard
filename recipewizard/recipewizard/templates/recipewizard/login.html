@@ -4,14 +4,6 @@
 
     <div class="d-flex flex-column align-items-center">
         <br><br>
-    
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert {% if message.tags %} {{ message.tags }} {% endif %}" role="alert">
-                    {{ message }} 
-                </div>
-            {% endfor %}
-        {% endif %}
 
         <form action="{% url 'login' %}" method="post" class="form-group w-25">
             <h2>Login</h2>

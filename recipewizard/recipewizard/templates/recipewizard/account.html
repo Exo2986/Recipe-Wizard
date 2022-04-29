@@ -1,5 +1,7 @@
 {% extends 'recipewizard/layout.html' %}
 
+{% load static %}
+
 {% block body %}
     <div class="container-fluid">
         <div class="row justify-content-center mb-2">
@@ -8,12 +10,12 @@
         <hr>
         <div class="row justify-content-center mb-2">
             <p class="col-1 my-auto text-right"><b>Username: </b></p>
-            <input type="text" class="form-control col-2 my-auto" readonly value="Example User">
+            <input type="text" class="form-control col-2 my-auto" readonly value="{{ request.user.username }}">
             <button class="ml-2 btn btn-primary my-auto" data-toggle="modal" data-target="#usernameModal">Update</button>
         </div>
         <div class="row justify-content-center mb-2">
             <p class="col-1 my-auto text-right"><b>Email: </b></p>
-            <input type="text" class="form-control col-2 my-auto" readonly value="example@example.com">
+            <input type="text" class="form-control col-2 my-auto" readonly value="{{ request.user.email }}">
             <button class="ml-2 btn btn-primary my-auto" data-toggle="modal" data-target="#emailModal">Update</button>
         </div>
         <div class="row justify-content-center mb-2">
@@ -32,13 +34,14 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="updateUsernameForm" class="form">
-                            <input type="text" class="form-control" placeholder="New Username">
+                        <form id="updateUsernameForm" class="form" action="{% url 'account_update' %}" method="post">
+                            {% csrf_token %}
+                            <input type="text" name="username" class="form-control" placeholder="New Username" required>
                         </form>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" type="submit" form="updateUsernameForm">Submit</button>
+                        <input class="btn btn-primary" type="submit" form="updateUsernameForm" value="Submit">
                     </div>
                 </div>
             </div>
@@ -54,15 +57,16 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="updateEmailForm" class="form">
-                            <input type="text" class="form-control" placeholder="Old Email">
-                            <input type="text" class="form-control" placeholder="New Email">
-                            <input type="text" class="form-control" placeholder="Confirm New Email">
+                        <form id="updateEmailForm" class="form-group" action="{% url 'account_update' %}" method="post" >
+                            {% csrf_token %}
+                            <input type="email" name="oldEmail" class="form-control" placeholder="Old Email" required>
+                            <input type="email" name="email" id="email-input" class="form-control" placeholder="New Email" required>
+                            <input type="email" name="emailConfirm" id="email-confirm-input" class="form-control" placeholder="Confirm New Email" required>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" type="submit" form="updateEmailForm">Submit</button>
+                        <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input class="btn btn-primary" type="submit" form="updateEmailForm" value="Submit">
                     </div>
                 </div>
             </div>
@@ -78,18 +82,23 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <form id="updatePasswordForm" class="form">
-                            <input type="password" class="form-control" placeholder="Old Password">
-                            <input type="password" class="form-control" placeholder="New Password">
-                            <input type="password" class="form-control" placeholder="Confirm New Password">
+                        <form id="updatePasswordForm" class="form" action="{% url 'account_update' %}" method="post">
+                            {% csrf_token %}
+                            <input type="password" name="oldPassword" class="form-control" placeholder="Old Password" required>
+                            <input type="password" name="password" id="password-input" class="form-control" placeholder="New Password" required>
+                            <input type="password" name="passwordConfirm" id="password-confirm-input" class="form-control" placeholder="Confirm New Password" required>
                         </form>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" type="submit" form="updatePasswordForm">Submit</button>
+                        <button class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <input class="btn btn-primary" type="submit" form="updatePasswordForm" value="Submit">
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'recipewizard/account.js' %}"></script>
 {% endblock %}
