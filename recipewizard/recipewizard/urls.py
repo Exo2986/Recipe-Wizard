@@ -14,15 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 
 from . import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("login", views.login_view, name="login"),
-    path("logout", views.logout_view, name="logout"),
-    path("register", views.register, name="register"),
+    path("account/", include("recipewizard.account.urls")),
     path("", views.index, name="index"),
     path("<int:page_num>", views.index, name="index-page"),
     path("search/<int:page_num>/", views.search, name="search"),
@@ -38,6 +36,4 @@ urlpatterns = [
     path("shoppinglist/modify", views.modify_shopping_list, name="modify_shopping_list"),
     path("shoppinglist/clear", views.clear_shopping_list, name="clear_shopping_list"),
     path("shoppinglist/batchadd", views.batch_add_to_shopping_list, name="batch_add_to_shopping_list"),
-    path("account", views.account, name="account"),
-    path("account/update", views.account_update, name="account_update")
 ]
