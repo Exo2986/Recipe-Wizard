@@ -25,14 +25,14 @@ class User(AbstractUser):
         return False
 
     def increment_failed_login_attempts(self):
-        if self.last_failed_login_attempt is not None and datetime.now(tz=timezone(timedelta())) - self.last_failed_login_attempt >= timedelta(minutes=5):
+        if self.last_failed_login_attempt is not None and datetime.now(tz=timezone(timedelta())) - self.last_failed_login_attempt >= timedelta(minutes=3):
             self.failed_login_attempts = 0
         
         self.failed_login_attempts+=1
         self.last_failed_login_attempt = datetime.now(tz=timezone(timedelta()))
 
         if self.failed_login_attempts >= 3:
-            self.account_unlock_datetime = datetime.now(tz=timezone(timedelta())) + timedelta(seconds=30)
+            self.account_unlock_datetime = datetime.now(tz=timezone(timedelta())) + timedelta(minutes=5)
 
         self.save()
 

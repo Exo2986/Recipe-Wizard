@@ -3,3 +3,4 @@ recipewizard/recipewizard/constants.py
 recipewizard/db.sqlite3
 recipewizard/recipewizard/migrations/*
 recipewizard/recipewizard/__pycache__/*
+recipewizard/recipewizard/settings.py
