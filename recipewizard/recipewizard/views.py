@@ -255,9 +255,14 @@ def recipe(request, recipe_id):
 
     ingredients = [{"amount_user_has": x.amount_of_ingredient_in_user_kitchen(request.user), "id": x.id, "name": x.name, "amount": x.format_amount(), "unit": x.unit} for x in recipe.ingredients.all()]
 
+    source = ""
+
+    if recipe.source_name is not None:
+        source = f"Source: {recipe.source_name}"
+    
     return render(request, "recipewizard/recipe_view.html", {
         "name": recipe.name,
-        "description": f"Source: {recipe.source_name}",
+        "description": source,
         "url": recipe.source_url,
         "image": recipe.image_url,
         "id": recipe.id,

@@ -21,7 +21,7 @@ def login_view(request):
         username = request.POST["username"]
         password = request.POST["password"]
         user_obj = User.objects.filter(username=username).first()
-        if user_obj.is_account_locked(): #dont authenticate
+        if user_obj is not None and user_obj.is_account_locked(): #dont authenticate
             messages.error(request, "This account is locked due to too many failed login attempts. Please try again later.")
             return render(request, "account/login.html")
         else: #try authentication
@@ -32,7 +32,8 @@ def login_view(request):
                 login(request, user)
                 return HttpResponseRedirect(reverse("index"))
             else:
-                user_obj.increment_failed_login_attempts()
+                if user_obj is not None:
+                    user_obj.increment_failed_login_attempts()
                 messages.error(request, "Invalid username or password.")
                 return render(request, "account/login.html")
     else:
