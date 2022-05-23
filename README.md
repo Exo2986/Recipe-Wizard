@@ -13,8 +13,7 @@
   In this situation, the user’s account will be locked for five minutes. After this time has passed, the account will no longer be locked.
   
   If the account is not locked, then the server will attempt to authenticate the user’s credentials. Password authentication is performed by the Django framework backend, which uses a PBKDF2 algorithm with a SHA256 hash.
-  
-	If the user’s credentials are valid, then they will be logged in and promptly redirected to the site’s landing page. Otherwise, the user’s failed login attempt counter will be incremented, the page will refresh, and the following error message will appear.
+  If the user’s credentials are valid, then they will be logged in and promptly redirected to the site’s landing page. Otherwise, the user’s failed login attempt counter will be incremented, the page will refresh, and the following error message will appear.
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/invalid.png?raw=true "Text box which displays: Invalid username or password.")
 
@@ -43,8 +42,7 @@
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/landingpage_page2.png?raw=true "Page 2 of the Recipe Wizard landing page. Ten different recipes are shown in the same format.")
 
   The “Prev” and “Next” buttons will only appear if a previous or a next page exists, respectively.
-  
-	Searches can be performed by inputting a query into the textbox at the top of the page and pressing Enter on your keyboard. This will redirect you to a page containing search results matching your query.
+  Searches can be performed by inputting a query into the textbox at the top of the page and pressing Enter on your keyboard. This will redirect you to a page containing search results matching your query.
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/searchresults.png?raw=true "Recipe wizard landing page search results. Recipes matching the search query are displayed in a paginated view of ten per page.")
 
@@ -117,25 +115,20 @@
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/myaccount_password.png?raw=true "A popup window titled 'Update Password'. The body of the window contains three textboxes. The first is labelled 'Old Password'. The second is labelled 'New Password'. The third is labelled 'Confirm New Password'.")
 
   This popup appears when the “Update” button on the password row is pressed. You must input your old password in the top textbox as a verification step. Then, the new password must be inputted twice into the bottom two textboxes. If they do not match, then the form cannot be submitted, and the same error message as the one in the email popup will show. Once all client-side verification checks have passed, an update query will be sent to the server.
-  
-	First, the server will verify that the old password is correct. If it is not, then processing will stop here, the page will refresh, and an error message will show. If the password matches, then the server will make sure that both “New Password” inputs match. If they do not, then the page will refresh, and an error message will appear. Otherwise, the user’s password will be updated, they will be logged out, and redirected to the login page.
+  First, the server will verify that the old password is correct. If it is not, then processing will stop here, the page will refresh, and an error message will show. If the password matches, then the server will make sure that both “New Password” inputs match. If they do not, then the page will refresh, and an error message will appear. Otherwise, the user’s password will be updated, they will be logged out, and redirected to the login page.
 
 ## Recipe Page
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage.png?raw=true "Recipe Wizard recipe page.")
-
-	The recipe page shows information about a given recipe. Next to the title on the top is the “Save” button. Clicking it will either save or un-save the recipe. Saved recipes appear on the “My Cookbook” page.
-  
-	Clicking the link below the image will redirect you to the website on which this recipe originated.
+  The recipe page shows information about a given recipe. Next to the title on the top is the “Save” button. Clicking it will either save or un-save the recipe. Saved recipes appear on the “My Cookbook” page.
+  Clicking the link below the image will redirect you to the website on which this recipe originated.
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_ingredients.png?raw=true "A table showing the ingredients involved in a recipe. The first and third rows are highlighted in red.")
 
   The serving count textbox allows you to change the proportions of the recipe. When the serving count is changed, the amounts of each ingredient will update proportionally.
-  
-	Ingredients will be highlighted red if the user does not have it listed on their My Kitchen page. This serves as an indicator of whether or not they are able to prepare the recipe with their current stock. 
+  Ingredients will be highlighted red if the user does not have it listed on their My Kitchen page. This serves as an indicator of whether or not they are able to prepare the recipe with their current stock. 
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_addalias.png?raw=true "A popup window titled 'Add Alias'. The body contains a single dropdown menu titled 'Alias'.")
-
 	The dropdown menu on the side of each row will show an option called “Add Alias”. Clicking on that will bring up this menu. Clicking on the “Alias” dropdown will show a list of names pulled from the user’s kitchen inventory. This allows you to let the system know that two ingredients are equivalent. For example: if a recipe calls for hot sauce, but you have Frank’s hot sauce listed in your kitchen, you can submit this form to let the system know that hot sauce and Frank’s hot sauce should be considered equivalent. Then, whenever the system queries the database for hot sauce, it will come up with Frank’s hot sauce.
   
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_ingredientsadded.png?raw=true "A popup window titled 'Missing ingredients added'. The body reads, 'Missing ingredients have been successfully added to your shopping list.")
@@ -143,5 +136,4 @@
   Clicking the “Add missing ingredients to shopping list” button will send a query to the server containing all rows highlighted in red. These ingredients will then be added to your shopping list. Pressing “Ok” will redirect you to the My Shopping List page, where you can see the ingredients have been added.
   
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_markcooked.png?raw=true "A popup window titled 'Mark as Cooked'. The body contains a single text boxese labelled 'Serving Count'.")
-
 	This menu appears whenever the “Mark recipe as cooked” is pressed. Inputting a numerical serving count here and pressing “Submit” will send a query to the server containing every ingredient in the recipe updated proportionally to the serving count. The server will then convert the recipe ingredient units to the kitchen ingredient units, and deduct all of these amounts from the amounts present in the user’s kitchen. If the leftover amount is less than 0.01, then that kitchen ingredient entry will be removed. The user will then be redirected to the My Kitchen page.
