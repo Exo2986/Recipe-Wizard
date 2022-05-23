@@ -120,6 +120,7 @@
 ## Recipe Page
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage.png?raw=true "Recipe Wizard recipe page.")
+
   The recipe page shows information about a given recipe. Next to the title on the top is the “Save” button. Clicking it will either save or un-save the recipe. Saved recipes appear on the “My Cookbook” page.
   Clicking the link below the image will redirect you to the website on which this recipe originated.
 
@@ -129,6 +130,7 @@
   Ingredients will be highlighted red if the user does not have it listed on their My Kitchen page. This serves as an indicator of whether or not they are able to prepare the recipe with their current stock. 
 
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_addalias.png?raw=true "A popup window titled 'Add Alias'. The body contains a single dropdown menu titled 'Alias'.")
+
 The dropdown menu on the side of each row will show an option called “Add Alias”. Clicking on that will bring up this menu. Clicking on the “Alias” dropdown will show a list of names pulled from the user’s kitchen inventory. This allows you to let the system know that two ingredients are equivalent. For example: if a recipe calls for hot sauce, but you have Frank’s hot sauce listed in your kitchen, you can submit this form to let the system know that hot sauce and Frank’s hot sauce should be considered equivalent. Then, whenever the system queries the database for hot sauce, it will come up with Frank’s hot sauce.
   
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_ingredientsadded.png?raw=true "A popup window titled 'Missing ingredients added'. The body reads, 'Missing ingredients have been successfully added to your shopping list.")
@@ -136,4 +138,5 @@ The dropdown menu on the side of each row will show an option called “Add Alia
   Clicking the “Add missing ingredients to shopping list” button will send a query to the server containing all rows highlighted in red. These ingredients will then be added to your shopping list. Pressing “Ok” will redirect you to the My Shopping List page, where you can see the ingredients have been added.
   
 ![Alt text](https://github.com/Exo2986/Recipe-Wizard/blob/master/readme_images/recipepage_markcooked.png?raw=true "A popup window titled 'Mark as Cooked'. The body contains a single text boxese labelled 'Serving Count'.")
+
 This menu appears whenever the “Mark recipe as cooked” is pressed. Inputting a numerical serving count here and pressing “Submit” will send a query to the server containing every ingredient in the recipe updated proportionally to the serving count. The server will then convert the recipe ingredient units to the kitchen ingredient units, and deduct all of these amounts from the amounts present in the user’s kitchen. If the leftover amount is less than 0.01, then that kitchen ingredient entry will be removed. The user will then be redirected to the My Kitchen page.
